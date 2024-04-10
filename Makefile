@@ -1,7 +1,7 @@
-obj-m += ksort.o
-ksort-objs := \
+obj-m += sort.o
+sort-objs := \
     sort_mod.o \
-    sort.o
+    sort_impl.o
 
 obj-m += xoro.o
 xoro-objs := \
@@ -26,11 +26,11 @@ test_xoro: test_xoro.c
 	$(CC) -o $@ $^
 
 insmod: all rmmod
-	sudo insmod ksort.ko
+	sudo insmod sort.ko
 	sudo insmod xoro.ko
 
 rmmod:
-	@sudo rmmod ksort 2>/dev/null || echo
+	@sudo rmmod sort 2>/dev/null || echo
 	@sudo rmmod xoro 2>/dev/null || echo
 
 check: user test_xoro

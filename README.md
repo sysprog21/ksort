@@ -8,6 +8,7 @@ In order to access the character device as a user you need to add a rule to
 udev with the included rules file.
 ```
 $ sudo cp 99-xoro.rules /etc/udev/rules.d/
+$ sudo cp 99-sort.rules /etc/udev/rules.d/
 $ sudo udevadm control --reload
 ```
 

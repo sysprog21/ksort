@@ -1,0 +1,1 @@
+KERNEL=="sort", SUBSYSTEM=="sort", MODE="0777"
