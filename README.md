@@ -1,6 +1,6 @@
 # ksort
 
-A Linux kernel module that creates the device `/dev/ksort`, capable of performing concurrent sorts.
+A Linux kernel module that creates the device `/dev/sort`, capable of performing concurrent sorts.
 
 ## User access to the character device
 

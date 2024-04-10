@@ -204,15 +204,15 @@ void sort_main(void *sort_buffer, size_t size, size_t es, cmp_t cmp)
      * within the work function.
      */
     struct qsort *q = kmalloc(sizeof(struct qsort), GFP_KERNEL);
-    struct common common;
-
-    common.swaptype =
-        ((char *) sort_buffer - (char *) 0) % sizeof(long) || es % sizeof(long)
-            ? 2
-        : es == sizeof(long) ? 0
-                             : 1;
-    common.es = es;
-    common.cmp = cmp;
+    struct common common = {
+        .swaptype = ((char *) sort_buffer - (char *) 0) % sizeof(long) ||
+                            es % sizeof(long)
+                        ? 2
+                    : es == sizeof(long) ? 0
+                                         : 1,
+        .es = es,
+        .cmp = cmp,
+    };
 
     init_qsort(q, sort_buffer, size, &common);
 

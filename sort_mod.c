@@ -19,12 +19,12 @@ static struct class *class;
 
 struct workqueue_struct *workqueue;
 
-static int ksort_open(struct inode *inode, struct file *file)
+static int sort_open(struct inode *inode, struct file *file)
 {
     return 0;
 }
 
-static int ksort_release(struct inode *inode, struct file *file)
+static int sort_release(struct inode *inode, struct file *file)
 {
     return 0;
 }
@@ -34,10 +34,10 @@ static int num_compare(const void *a, const void *b)
     return (*(int *) a - *(int *) b);
 }
 
-static ssize_t ksort_read(struct file *file,
-                          char *buf,
-                          size_t size,
-                          loff_t *offset)
+static ssize_t sort_read(struct file *file,
+                         char *buf,
+                         size_t size,
+                         loff_t *offset)
 {
     unsigned long len;
     size_t es;
@@ -68,23 +68,23 @@ static ssize_t ksort_read(struct file *file,
     return size;
 }
 
-static ssize_t ksort_write(struct file *file,
-                           const char *buf,
-                           size_t size,
-                           loff_t *offset)
+static ssize_t sort_write(struct file *file,
+                          const char *buf,
+                          size_t size,
+                          loff_t *offset)
 {
     return 0;
 }
 
 static const struct file_operations fops = {
-    .read = ksort_read,
-    .write = ksort_write,
-    .open = ksort_open,
-    .release = ksort_release,
+    .read = sort_read,
+    .write = sort_write,
+    .open = sort_open,
+    .release = sort_release,
     .owner = THIS_MODULE,
 };
 
-static int __init ksort_init(void)
+static int __init sort_init(void)
 {
     struct device *device;
 
@@ -107,7 +107,7 @@ static int __init ksort_init(void)
     if (cdev_add(&cdev, dev, 1) < 0)
         goto error_device_destroy;
 
-    workqueue = alloc_workqueue("ksortq", 0, WQ_MAX_ACTIVE);
+    workqueue = alloc_workqueue("sortq", 0, WQ_MAX_ACTIVE);
     if (!workqueue)
         goto error_cdev_del;
 
@@ -125,7 +125,7 @@ error_unregister_chrdev_region:
     return -1;
 }
 
-static void __exit ksort_exit(void)
+static void __exit sort_exit(void)
 {
     /* Given that drain_workqueue will be executed, there is no need for an
      * explicit flush action.
@@ -140,5 +140,5 @@ static void __exit ksort_exit(void)
     printk(KERN_INFO DEVICE_NAME ": unloaded\n");
 }
 
-module_init(ksort_init);
-module_exit(ksort_exit);
+module_init(sort_init);
+module_exit(sort_exit);
