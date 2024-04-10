@@ -11,7 +11,7 @@ MODULE_AUTHOR("National Cheng Kung University, Taiwan");
 MODULE_DESCRIPTION("Concurrent sorting driver");
 MODULE_VERSION("0.1");
 
-#define DEVICE_NAME "ksort"
+#define DEVICE_NAME "sort"
 
 static dev_t dev = -1;
 static struct cdev cdev;

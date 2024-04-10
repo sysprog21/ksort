@@ -5,7 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#define KSORT_DEV "/dev/ksort"
+#define KSORT_DEV "/dev/sort"
 
 int main()
 {

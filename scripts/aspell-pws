@@ -167,3 +167,7 @@ tasklet
 kmalloc
 kzalloc
 kfree
+xoroshiro
+xoro
+RNG
+PRNG

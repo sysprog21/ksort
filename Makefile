@@ -1,6 +1,11 @@
-MODULENAME := ksort
-obj-m += $(MODULENAME).o
-$(MODULENAME)-y += main.o sort.o
+obj-m += ksort.o
+ksort-objs := \
+    sort_mod.o \
+    sort.o
+
+obj-m += xoro.o
+xoro-objs := \
+    xoro_mod.o
 
 GIT_HOOKS := .git/hooks/applied
 
@@ -17,17 +22,23 @@ $(GIT_HOOKS):
 user: user.c
 	$(CC) -o $@ $^
 
-insmod: all
-	sudo insmod $(MODULENAME).ko
+test_xoro: test_xoro.c
+	$(CC) -o $@ $^
+
+insmod: all rmmod
+	sudo insmod ksort.ko
+	sudo insmod xoro.ko
 
 rmmod:
-	sudo rmmod $(MODULENAME)
+	@sudo rmmod ksort 2>/dev/null || echo
+	@sudo rmmod xoro 2>/dev/null || echo
 
-check:
+check: user test_xoro
 	$(MAKE) insmod
 	sudo ./user
+	sudo ./test_xoro
 	$(MAKE) rmmod
 
 clean:
 	$(MAKE) -C $(KDIR) M=$(PWD) clean
-	$(RM) user
+	$(RM) user test_xoro
