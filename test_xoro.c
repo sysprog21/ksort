@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 #define MAX_BYTES_PER_READ 8
-static unsigned char rx[MAX_BYTES_PER_READ];  // Receive buffer from the LKM.
+static unsigned char rx[MAX_BYTES_PER_READ]; /* Receive buffer from the LKM */
 
 void zero_rx(void)
 {
@@ -23,12 +23,13 @@ int main(int argc, char *argv[])
         return errno;
     }
 
-    // Test reading different numbers of bytes.
+    /* Test reading different numbers of bytes. */
     for (int n_bytes = 0; n_bytes < 10; n_bytes++) {
-        zero_rx();  // Clear/zero the buffer before copying in read data.
+        /* Clear/zero the buffer before copying in read data. */
+        zero_rx();
 
-        ssize_t n_bytes_read =
-            read(fd, rx, n_bytes);  // Read the response from the LKM
+        /* Read the response from the LKM. */
+        ssize_t n_bytes_read = read(fd, rx, n_bytes);
 
         if (0 > n_bytes_read) {
             perror("Failed to read all bytes.");

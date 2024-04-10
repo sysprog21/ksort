@@ -7,12 +7,14 @@ obj-m += xoro.o
 xoro-objs := \
     xoro_mod.o
 
+CFLAGS = -Wall -Werror
+
 GIT_HOOKS := .git/hooks/applied
 
 KDIR := /lib/modules/$(shell uname -r)/build
 PWD := $(shell pwd)
 
-all: $(GIT_HOOKS) user
+all: $(GIT_HOOKS) user test_xoro
 	$(MAKE) -C $(KDIR) M=$(PWD) modules
 
 $(GIT_HOOKS):
@@ -20,10 +22,10 @@ $(GIT_HOOKS):
 	@echo
 
 user: user.c
-	$(CC) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^
 
 test_xoro: test_xoro.c
-	$(CC) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^
 
 insmod: all rmmod
 	sudo insmod sort.ko
@@ -33,7 +35,7 @@ rmmod:
 	@sudo rmmod sort 2>/dev/null || echo
 	@sudo rmmod xoro 2>/dev/null || echo
 
-check: user test_xoro
+check: all
 	$(MAKE) insmod
 	sudo ./user
 	sudo ./test_xoro
