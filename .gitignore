@@ -1,30 +1,9 @@
-# Prerequisites
-*.d
-.cache.mk
-
-# Object files
 *.o
 *.ko
-*.elf
-
-# Linker output
-*.map
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.a
-
-# Kernel Module Compile Results
-*.mod*
+*.mod
+*.mod.c
+*.mod.o
+*.order
 *.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
-
-# test-oriented
-out
+*.symvers
+user

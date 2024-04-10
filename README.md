@@ -1,14 +1,16 @@
 # ksort
 
-Linux kernel module that implements and validates sorting algorithms.
+A Linux kernel module that creates the device `/dev/ksort`, capable of performing concurrent sorts.
 
-## Origin
-
-The implementation was taken from Linux kernel source tree.
-* [lib/sort.c](https://github.com/torvalds/linux/tree/master/lib/sort.c)
-* [lib/test_sort.c](https://github.com/torvalds/linux/blob/master/lib/test_sort.c)
+## References
+* [The Linux Kernel Module Programming Guide](https://sysprog21.github.io/lkmpg/)
+* [Writing a simple device driver](https://www.apriorit.com/dev-blog/195-simple-driver-for-linux-os)
+* [Character device drivers](https://linux-kernel-labs.github.io/refs/heads/master/labs/device_drivers.html)
+* [cdev interface](https://lwn.net/Articles/195805/)
+* [Character device files](https://sysplay.in/blog/linux-device-drivers/2013/06/character-device-files-creation-operations/)
+* [Linux Workqueue](https://www.kernel.org/doc/html/latest/core-api/workqueue.html)
 
 ## License
 
-`ksort`is released under the GNU GPLv2. Use of this source code is governed by
-the GNU GPL license version 2 that can be found in the LICENSE file.
+`ksort`is released under the MIT license. Use of this source code is governed by
+a MIT-style license that can be found in the `LICENSE` file.

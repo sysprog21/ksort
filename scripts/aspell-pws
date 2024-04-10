@@ -159,3 +159,11 @@ xor
 xoro
 xoroshiro
 prng
+ksort
+cmwq
+workqueue
+spinlock
+tasklet
+kmalloc
+kzalloc
+kfree
