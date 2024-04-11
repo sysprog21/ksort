@@ -3,6 +3,7 @@
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/slab.h>
+#include <linux/version.h>
 
 #include "sort.h"
 
@@ -92,8 +93,11 @@ static int __init sort_init(void)
 
     if (alloc_chrdev_region(&dev, 0, 1, DEVICE_NAME) < 0)
         return -1;
-
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
     class = class_create(THIS_MODULE, DEVICE_NAME);
+#else
+    class = class_create(DEVICE_NAME);
+#endif
     if (IS_ERR(class)) {
         goto error_unregister_chrdev_region;
     }

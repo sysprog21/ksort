@@ -7,6 +7,7 @@
 #include <linux/module.h>
 #include <linux/mutex.h>
 #include <linux/uaccess.h>
+#include <linux/version.h>
 
 #define DEVICE_NAME "xoro"
 #define CLASS_NAME "xoro"
@@ -121,7 +122,11 @@ static int __init xoro_init(void)
     }
     printk(KERN_INFO "XORO:   major_number=%d\n", major_number);
 
-    dev_class = class_create(THIS_MODULE, CLASS_NAME);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 4, 0)
+    dev_class = class_create(THIS_MODULE, DEVICE_NAME);
+#else
+    dev_class = class_create(DEVICE_NAME);
+#endif
     if (IS_ERR(dev_class)) {
         unregister_chrdev(major_number, DEVICE_NAME);  // backout
         printk(KERN_ALERT "XORO: Failed to create dev_class\n");
