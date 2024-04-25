@@ -39,7 +39,7 @@ int main()
         }
     }
 
-    printf("Soring %s!\n", pass ? "succeeded" : "failed");
+    printf("Sorting %s!\n", pass ? "succeeded" : "failed");
 
 error:
     free(inbuf);
