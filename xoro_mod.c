@@ -1,4 +1,4 @@
-/* Acharacter device which returns bytes from a PRNG in the xorshiro family. */
+/* A character device which returns bytes from a PRNG in the xorshiro family. */
 
 #include <linux/device.h>
 #include <linux/fs.h>
