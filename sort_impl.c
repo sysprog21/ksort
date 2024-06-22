@@ -1,6 +1,7 @@
 #include <linux/slab.h>
 #include <linux/sort.h>
 #include <linux/workqueue.h>
+#include <linux/ktime.h>
 
 #include "sort.h"
 
@@ -213,10 +214,13 @@ void sort_main(void *sort_buffer, size_t size, size_t es, cmp_t cmp)
         .es = es,
         .cmp = cmp,
     };
+    //printk("swaptype: %d, es: %lu\n", common.swaptype, common.es);
 
+   
     init_qsort(q, sort_buffer, size, &common);
 
     queue_work(workqueue, &q->w);
+   
 
     /* Ensure completion of all work before proceeding, as reliance on objects
      * allocated on the stack necessitates this. If not, there is a risk of

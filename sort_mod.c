@@ -4,8 +4,11 @@
 #include <linux/module.h>
 #include <linux/slab.h>
 #include <linux/version.h>
+#include <linux/ktime.h>
 
 #include "sort.h"
+
+#include <linux/sort.h>
 
 MODULE_LICENSE("Dual MIT/GPL");
 MODULE_AUTHOR("National Cheng Kung University, Taiwan");
@@ -17,6 +20,8 @@ MODULE_VERSION("0.1");
 static dev_t dev = -1;
 static struct cdev cdev;
 static struct class *class;
+static int sort_selector = 0;
+
 
 struct workqueue_struct *workqueue;
 
@@ -32,8 +37,14 @@ static int sort_release(struct inode *inode, struct file *file)
 
 static int num_compare(const void *a, const void *b)
 {
-    return (*(int *) a - *(int *) b);
+    return (*(uint64_t *) a - *(uint64_t *) b);
 }
+
+static int cmpuint64(const void *a, const void *b)
+{
+    return *(uint64_t *) a < *(uint64_t *) b;
+}
+
 
 static ssize_t sort_read(struct file *file,
                          char *buf,
@@ -47,6 +58,10 @@ static ssize_t sort_read(struct file *file,
     if (!sort_buffer)
         return 0;
 
+    //int *time_buf = kmalloc(sizeof(sort_time), GFP_KERNEL);
+    //if(!time_buf)
+      //  return 0;
+
     /* FIXME: Requiring users to manually input data into a buffer for read
      * operations is not ideal, even if it is only for testing purposes.
      */
@@ -58,15 +73,48 @@ static ssize_t sort_read(struct file *file,
      * intention to expand the sorting object's capability to accommodate
      * various types in the future.
      */
-    es = sizeof(int);
-    sort_main(sort_buffer, size / es, es, num_compare);
+    es = sizeof(uint64_t);
+    ktime_t start_time , time_cost;
+    
+    if(sort_selector == 3){
+	start_time = ktime_get();
+
+        sort_pdqsort(sort_buffer, size / es, es, cmpuint64, 0);
+        
+	time_cost = ktime_sub(ktime_get(), start_time);
+
+
+        printk("pdqsort time_cost  %lld ns\n", ktime_to_ns(time_cost));
+	printk("sorted by pdqsort\n");
+    }else if(sort_selector == 2){
+	start_time = ktime_get();
+
+	sort(sort_buffer, size / es, es , num_compare, NULL);
+
+	time_cost = ktime_sub(ktime_get(), start_time);
+
+	
+	printk("linux sort time_cost  %lld ns\n", ktime_to_ns(time_cost));
+	printk("sorted by linux sort\n");
+    }else if(sort_selector == 1){
+	start_time = ktime_get();
+
+    	sort_main(sort_buffer, size / es, es, num_compare);
+
+	time_cost = ktime_sub(ktime_get(), start_time);
+	
+	printk("qsort time_cost  %lld ns\n", ktime_to_ns(time_cost));
+        printk("sorted by qsort\n");
+    }else {
+	printk("please select sort type first\n");
+    }
 
     len = copy_to_user(buf, sort_buffer, size);
     if (len != 0)
         return 0;
 
     kfree(sort_buffer);
-    return size;
+    return time_cost;
 }
 
 static ssize_t sort_write(struct file *file,
@@ -74,7 +122,24 @@ static ssize_t sort_write(struct file *file,
                           size_t size,
                           loff_t *offset)
 {
-    return 0;
+    void *set_sort_buf = kmalloc(size, GFP_KERNEL);
+    if (!set_sort_buf)
+        return 0;
+
+    unsigned long len;
+    len = copy_from_user(set_sort_buf, buf, size);
+    if (len != 0)
+        return 0;
+
+    int set_sort = *(int *)set_sort_buf;
+    if(set_sort > 0 && set_sort < 4){
+	sort_selector = set_sort;
+	printk("sort_selector : %d", set_sort);
+	return set_sort;
+    }else{
+	printk("sort_selector error");
+	return 0;
+    }	
 }
 
 static const struct file_operations fops = {
