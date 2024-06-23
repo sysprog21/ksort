@@ -25,7 +25,7 @@ int main()
 
     ssize_t r_sz = read(fd, inbuf, size);
     if (r_sz != size) {
-        perror("Failed to write character device");
+        perror("Failed to read character device");
         goto error;
     }
 
