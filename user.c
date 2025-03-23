@@ -8,17 +8,18 @@
 
 int main()
 {
+    int ret = 0;
     int fd = open(KSORT_DEV, O_RDWR);
     if (fd < 0) {
         perror("Failed to open character device");
-        goto error;
+        goto error_open;
     }
 
     size_t n_elements = 1000;
     size_t size = n_elements * sizeof(int);
     int *inbuf = malloc(size);
     if (!inbuf)
-        goto error;
+        goto error_alloc;
 
     for (size_t i = 0; i < n_elements; i++)
         inbuf[i] = rand() % n_elements;
@@ -26,11 +27,10 @@ int main()
     ssize_t r_sz = read(fd, inbuf, size);
     if (r_sz != size) {
         perror("Failed to read character device");
-        goto error;
+        goto error_read;
     }
 
     bool pass = true;
-    int ret = 0;
     /* Verify the result of sorting */
     for (size_t i = 1; i < n_elements; i++) {
         if (inbuf[i] < inbuf[i - 1]) {
@@ -41,9 +41,10 @@ int main()
 
     printf("Sorting %s!\n", pass ? "succeeded" : "failed");
 
-error:
+error_read:
     free(inbuf);
-    if (fd > 0)
-        close(fd);
+error_alloc:
+    close(fd);
+error_open:
     return ret;
 }
