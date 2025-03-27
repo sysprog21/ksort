@@ -8,18 +8,22 @@
 
 int main()
 {
-    int ret = 0;
+    int ret = EXIT_SUCCESS;
     int fd = open(KSORT_DEV, O_RDWR);
     if (fd < 0) {
         perror("Failed to open character device");
+        ret = EXIT_FAILURE;
         goto error_open;
     }
 
     size_t n_elements = 1000;
     size_t size = n_elements * sizeof(int);
     int *inbuf = malloc(size);
-    if (!inbuf)
+    if (!inbuf) {
+        perror("Failed to allocate memory");
+        ret = EXIT_FAILURE;
         goto error_alloc;
+    }
 
     for (size_t i = 0; i < n_elements; i++)
         inbuf[i] = rand() % n_elements;
@@ -27,6 +31,7 @@ int main()
     ssize_t r_sz = read(fd, inbuf, size);
     if (r_sz != size) {
         perror("Failed to read character device");
+        ret = EXIT_FAILURE;
         goto error_read;
     }
 
