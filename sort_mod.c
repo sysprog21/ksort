@@ -17,6 +17,8 @@ MODULE_VERSION("0.1");
 static dev_t dev = -1;
 static struct cdev cdev;
 static struct class *class;
+static void *user_data = NULL;
+static size_t user_data_size = 0;
 
 struct workqueue_struct *workqueue;
 
@@ -35,6 +37,31 @@ static int num_compare(const void *a, const void *b)
     return (*(int *) a - *(int *) b);
 }
 
+static ssize_t sort_write(struct file *file,
+                          const char __user *buf,
+                          size_t size,
+                          loff_t *offset)
+{
+    unsigned long len;
+    void *tmp;
+
+    tmp = kmalloc(size, GFP_KERNEL);
+    if (!tmp)
+        return 0;
+
+    len = copy_from_user(tmp, buf, size);
+    if (len != 0) {
+        kfree(tmp);
+        return 0;
+    }
+
+    kfree(user_data);
+    user_data = tmp;
+    user_data_size = size;
+
+    return size;
+}
+
 static ssize_t sort_read(struct file *file,
                          char *buf,
                          size_t size,
@@ -42,16 +69,13 @@ static ssize_t sort_read(struct file *file,
 {
     unsigned long len;
     size_t es;
+    void *sort_buffer;
 
-    void *sort_buffer = kmalloc(size, GFP_KERNEL);
-    if (!sort_buffer)
+    if (!user_data || size != user_data_size)
         return 0;
 
-    /* FIXME: Requiring users to manually input data into a buffer for read
-     * operations is not ideal, even if it is only for testing purposes.
-     */
-    len = copy_from_user(sort_buffer, buf, size);
-    if (len != 0)
+    sort_buffer = kmemdup(user_data, size, GFP_KERNEL);
+    if (!sort_buffer)
         return 0;
 
     /* TODO: While currently designed to handle integer arrays, there is an
@@ -62,19 +86,12 @@ static ssize_t sort_read(struct file *file,
     sort_main(sort_buffer, size / es, es, num_compare);
 
     len = copy_to_user(buf, sort_buffer, size);
+    kfree(sort_buffer);
+
     if (len != 0)
         return 0;
 
-    kfree(sort_buffer);
     return size;
-}
-
-static ssize_t sort_write(struct file *file,
-                          const char *buf,
-                          size_t size,
-                          loff_t *offset)
-{
-    return 0;
 }
 
 static const struct file_operations fops = {
