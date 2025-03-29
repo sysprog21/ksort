@@ -28,11 +28,18 @@ int main()
     for (size_t i = 0; i < n_elements; i++)
         inbuf[i] = rand() % n_elements;
 
+    ssize_t w_sz = write(fd, inbuf, size);
+    if (w_sz != size) {
+        perror("Failed to write character device");
+        ret = EXIT_FAILURE;
+        goto error_rw;
+    }
+
     ssize_t r_sz = read(fd, inbuf, size);
     if (r_sz != size) {
         perror("Failed to read character device");
         ret = EXIT_FAILURE;
-        goto error_read;
+        goto error_rw;
     }
 
     bool pass = true;
@@ -46,7 +53,7 @@ int main()
 
     printf("Sorting %s!\n", pass ? "succeeded" : "failed");
 
-error_read:
+error_rw:
     free(inbuf);
 error_alloc:
     close(fd);
